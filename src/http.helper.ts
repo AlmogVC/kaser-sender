@@ -1,7 +1,7 @@
 import * as http from 'http';
 import * as querystring from 'querystring';
 
-export function httpGet(hostname, port, apiPath): Promise<any> {
+export function httpGet(hostname: string, port: number, apiPath: string): Promise<any> {
     return new Promise((resolve, reject) => {
         http.get(`http://${hostname}:${port}${apiPath}`, res => {
             let data = '';
@@ -19,7 +19,7 @@ export function httpGet(hostname, port, apiPath): Promise<any> {
     });
 }
 
-export function httpPost(hostname, port, path, body) {
+export function httpPost(hostname: string, port: number, path: string, body: any) {
     const postData = querystring.stringify(body);
     const options = {
         hostname,

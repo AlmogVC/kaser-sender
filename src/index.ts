@@ -10,7 +10,7 @@ const DEFAULT_INTERVAL_MARGIN = 5;
 
 start('test', { kaserService: { hostname: 'localhost', port: 5001 } });
 
-async function start(serviceName, kaserSenderConfig: KaserSenderConfig) {
+async function start(serviceName: string, kaserSenderConfig: KaserSenderConfig) {
     const kaserService: KaserService = new KaserService(
         kaserSenderConfig.kaserService.hostname,
         kaserSenderConfig.kaserService.port,
@@ -67,7 +67,7 @@ function startSender(serviceName: string, seconds: number, transport: Transport<
     }, interval);
 }
 
-function createAliveSignal(serviceName) {
+function createAliveSignal(serviceName: string) {
     return {
         hostname: os.hostname(),
         serviceName,
