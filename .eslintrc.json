@@ -1,0 +1,30 @@
+{
+    "extends": ["airbnb-base", "plugin:prettier/recommended"],
+    "globals": {
+        "Atomics": "readonly",
+        "SharedArrayBuffer": "readonly"
+    },
+    "parserOptions": {
+        "ecmaVersion": 2019,
+        "sourceType": "module"
+    },
+    "plugins": [],
+    "settings": {
+        "import/resolver": {
+            "node": {
+                "extensions": [".js"]
+            }
+        }
+    },
+    "rules": {
+        "no-console": "off",
+        "lines-between-class-members": "off",
+        "no-unused-vars": "off",
+        "class-methods-use-this": "off",
+        "max-classes-per-file": "off",
+        "import/extensions": "off",
+        "no-use-before-define": "off",
+        "no-underscore-dangle": "off",
+        "no-param-reassign": "off"
+    }
+}
