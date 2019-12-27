@@ -48,11 +48,15 @@ export default class KaserSender {
 
         let interval: number = this.config.interval || DEFAULT_INTERVAL;
 
-        if (
+        if (this.config.interval) {
+            interval = this.config.interval;
+        } else if (
             kaserConfig.service.maxSilenceTimeInSeconds &&
             typeof kaserConfig.service.maxSilenceTimeInSeconds === 'number'
         ) {
             interval = kaserConfig.service.maxSilenceTimeInSeconds;
+        } else {
+            interval = DEFAULT_INTERVAL;
         }
 
         interval -= this.config.intervalMargin || DEFAULT_INTERVAL_MARGIN;
