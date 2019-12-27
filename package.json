@@ -2,12 +2,14 @@
     "name": "kaser-sender",
     "version": "0.0.0",
     "description": "An npm package that sends alive signals to Kaser",
-    "main": "src/index.js",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
     "scripts": {
         "dev": "ts-node src/index.ts",
         "start": "node dist/index.js",
         "build": "tsc",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "prepublish": "tsc"
     },
     "author": "Almog Vagman Ciprut",
     "license": "MIT",
