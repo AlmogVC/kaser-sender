@@ -6,8 +6,14 @@ export interface HttpTransportConfig {
     kaserService: KaserService;
 }
 
-export class HttpTransport extends Transport<HttpTransportConfig> {
+export class HttpTransport extends Transport {
+    kaserService: KaserService;
+
+    constructor(kaserService: KaserService) {
+        super();
+        this.kaserService = kaserService;
+    }
     send(aliveSignal: AliveSignal) {
-        return this.config.kaserService.sendAliveSignal(aliveSignal);
+        return this.kaserService.sendAliveSignal(aliveSignal);
     }
 }

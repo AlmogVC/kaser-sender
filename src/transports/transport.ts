@@ -1,11 +1,5 @@
 import { AliveSignal } from '../kaser.types';
 
-export default abstract class Transport<ConfigType extends {}> {
-    config: ConfigType;
-
-    constructor(config: ConfigType) {
-        this.config = config;
-    }
-
+export default abstract class Transport {
     abstract send(aliveSignal: AliveSignal): void;
 }

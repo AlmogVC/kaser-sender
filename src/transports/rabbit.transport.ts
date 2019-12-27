@@ -1,6 +1,6 @@
 import Transport from './transport';
 import { AliveSignal } from '../kaser.types';
-import * as rabbitMQ from '../rabbitmq';
+import * as rabbitMQ from '../utils/rabbitmq';
 
 export interface RabbitTransportConfig {
     username: string;
@@ -12,7 +12,14 @@ export interface RabbitTransportConfig {
     routingKey: string;
 }
 
-export class RabbitTransport extends Transport<RabbitTransportConfig> {
+export class RabbitTransport extends Transport {
+    config: RabbitTransportConfig;
+
+    constructor(config: RabbitTransportConfig) {
+        super();
+        this.config = config;
+    }
+
     init() {
         return rabbitMQ.connect(this.config.username, this.config.password, this.config.host, this.config.port);
     }

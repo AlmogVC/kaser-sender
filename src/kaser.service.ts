@@ -1,5 +1,5 @@
 import { KaserConfig, AliveSignal } from './kaser.types';
-import { httpGet, httpPost } from './http.helper';
+import { httpGet, httpPost } from './utils/http.helper';
 
 export default class KaserService {
     constructor(private hostname: string, private port: number) {}
