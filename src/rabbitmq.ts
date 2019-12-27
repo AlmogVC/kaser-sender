@@ -1,9 +1,9 @@
 import * as amqplib from 'amqplib';
 
-let connection;
-let publishChannel;
+let connection: amqplib.Connection;
+let publishChannel: amqplib.Channel;
 
-export async function connect(username, password, host, port) {
+export async function connect(username: string, password: string, host: string, port: number) {
     connection = await amqplib.connect(`amqp://${username}:${password}@${host}:${port}`);
 
     connection.on('error', error => {
@@ -35,7 +35,13 @@ export function closeConnection() {
     return Promise.resolve(null);
 }
 
-export async function publish(exchange, type, routingKey, message, options) {
+export async function publish(
+    exchange: string,
+    type: string,
+    routingKey: string,
+    message: Object,
+    options?: amqplib.Options.Publish,
+) {
     if (!publishChannel) {
         publishChannel = await connection.createChannel();
 

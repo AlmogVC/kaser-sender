@@ -1,17 +1,9 @@
-import http from 'http';
-import querystring from 'querystring';
+import * as http from 'http';
+import * as querystring from 'querystring';
 
-export function getConfig(address) {
-    return httpGet(`${address}/api/config`);
-}
-
-export function sendAliveSignal(hostname, port, aliveSignal) {
-    return httpPost(hostname, port, '/api/aliveSignal', aliveSignal);
-}
-
-function httpGet(address) {
+export function httpGet(hostname, port, apiPath): Promise<any> {
     return new Promise((resolve, reject) => {
-        http.get(address, res => {
+        http.get(`http://${hostname}:${port}${apiPath}`, res => {
             let data = '';
 
             res.on('data', chunk => {
@@ -27,7 +19,7 @@ function httpGet(address) {
     });
 }
 
-function httpPost(hostname, port, path, body) {
+export function httpPost(hostname, port, path, body) {
     const postData = querystring.stringify(body);
     const options = {
         hostname,

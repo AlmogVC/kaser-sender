@@ -1,0 +1,23 @@
+import Transport from './transport';
+import { AliveSignal } from '../kaser.types';
+import * as rabbitMQ from '../rabbitmq';
+
+export interface RabbitTransportConfig {
+    username: string;
+    password: string;
+    host: string;
+    port: number;
+    exchange: string;
+    exchangeType: string;
+    routingKey: string;
+}
+
+export class RabbitTransport extends Transport<RabbitTransportConfig> {
+    init() {
+        return rabbitMQ.connect(this.config.username, this.config.password, this.config.host, this.config.port);
+    }
+
+    send(aliveSignal: AliveSignal) {
+        rabbitMQ.publish(this.config.exchange, this.config.exchangeType, this.config.routingKey, aliveSignal);
+    }
+}
