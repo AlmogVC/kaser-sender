@@ -9,7 +9,7 @@ Exmple
 ```javascript
 import * as KaserSender from 'kaser-sender';
 
-KaserSender.init({
+KaserSender.start({
     kaserService: {
         hostname: 'localhost',
         port: 5001,
@@ -24,8 +24,6 @@ KaserSender.init({
         },
     },
 });
-
-KaserSender.start();
 ```
 
 ## Config
