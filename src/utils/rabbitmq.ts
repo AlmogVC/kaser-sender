@@ -1,4 +1,5 @@
 import * as amqplib from 'amqplib';
+import { LoggingLevel, Logger } from './logger';
 
 let connection: amqplib.Connection;
 let publishChannel: amqplib.Channel;
@@ -7,22 +8,20 @@ export async function connect(username: string, password: string, host: string, 
     connection = await amqplib.connect(`amqp://${username}:${password}@${host}:${port}`);
 
     connection.on('error', error => {
-        console.log('[RabbitMQ] connection error');
-        console.log(error);
+        Logger.log(LoggingLevel.Error, 'RabbitMQ connection error', error);
 
         process.exit(1);
     });
 
     connection.on('close', error => {
         if (process.env.NODE_ENV !== 'test') {
-            console.log('[RabbitMQ] connection close');
-            console.log(error);
+            Logger.log(LoggingLevel.Info, 'RabbitMQ connection close', error);
 
             process.exit(1);
         }
     });
 
-    console.log(`[RabbitMQ] connected on port ${port}`);
+    Logger.log(LoggingLevel.Info, `RabbitMQ connected on port ${port}`);
 
     return connection;
 }
@@ -46,16 +45,14 @@ export async function publish(
         publishChannel = await connection.createChannel();
 
         publishChannel.on('error', error => {
-            console.log('[RabbitMQ] channel error');
-            console.log(error);
+            Logger.log(LoggingLevel.Warning, `RabbitMQ channel error`, error);
 
             process.exit(1);
         });
 
         publishChannel.on('close', error => {
             if (process.env.NODE_ENV !== 'test') {
-                console.log('[RabbitMQ] channel close');
-                console.log(error);
+                Logger.log(LoggingLevel.Info, `RabbitMQ channel close`, error);
 
                 process.exit(1);
             }

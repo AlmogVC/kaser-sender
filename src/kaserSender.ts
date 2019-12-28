@@ -4,6 +4,7 @@ import KaserService from './kaser.service';
 import Transport from './transports/transport';
 import { RabbitTransportConfig, RabbitTransport } from './transports/rabbit.transport';
 import { HttpTransport } from './transports/http.transport';
+import { LoggingLevel, Logger } from './utils/logger';
 
 const DEFAULT_INTERVAL = 60;
 const DEFAULT_INTERVAL_MARGIN = 5;
@@ -21,42 +22,50 @@ export default class KaserSender {
             this.config.kaserService.port,
         );
 
-        const kaserConfig: KaserConfig = await kaserService.getConfig();
+        const kaserConfig: KaserConfig | undefined = await kaserService.getConfig().catch(reason => {
+            Logger.log(LoggingLevel.Error, `could not connect to kaser to get config`, reason);
+            return undefined;
+        });
 
-        const isRmqActive = this.config.useHttp !== undefined ? this.config.useHttp : kaserConfig.rabbitMQ.isActive;
+        const isRmqActive =
+            this.config.useHttp !== undefined ? !this.config.useHttp : kaserConfig?.rabbitMQ.isActive || false;
         let transport: Transport;
 
         if (isRmqActive) {
             const rabbitTransportConfig: RabbitTransportConfig = {
-                host: this.config.rabbitMQ?.host || kaserConfig.rabbitMQ.host,
-                port: this.config.rabbitMQ?.port || kaserConfig.rabbitMQ.port,
+                host: this.config.rabbitMQ?.host || kaserConfig?.rabbitMQ.host || 'localhost',
+                port: this.config.rabbitMQ?.port || kaserConfig?.rabbitMQ.port || 5001,
                 username: this.config.rabbitMQ?.user || 'guest',
                 password: this.config.rabbitMQ?.password || 'guest',
-                exchange: this.config.rabbitMQ?.exchange || kaserConfig.rabbitMQ.exchange,
+                exchange: this.config.rabbitMQ?.exchange || kaserConfig?.rabbitMQ.exchange || 'kaser-exchange',
                 routingKey: this.config.rabbitMQ?.routingKey || `test.aliveSignal`,
-                exchangeType: this.config.rabbitMQ?.exchangeType || kaserConfig.rabbitMQ.exchangeType,
+                exchangeType: this.config.rabbitMQ?.exchangeType || kaserConfig?.rabbitMQ.exchangeType || 'topic',
             };
 
             transport = new RabbitTransport(rabbitTransportConfig);
 
-            await (transport as RabbitTransport).init();
-            console.log('[Kaser Sender] RabbitMQ transport initialized');
+            const rabbitMqConnection = await (transport as RabbitTransport).init().catch(reason => {
+                Logger.log(LoggingLevel.Error, `could not connect to RabbitMQ`, reason);
+                return undefined;
+            });
+
+            if (rabbitMqConnection) {
+                Logger.log(LoggingLevel.Debug, `RabbitMQ transport initialized`);
+            }
         } else {
             transport = new HttpTransport(kaserService);
-            console.log('[Kaser Sender] HTTP transport initialized');
+            Logger.log(LoggingLevel.Debug, `HTTP transport initialized`);
         }
 
-        let interval: number = this.config.interval || DEFAULT_INTERVAL;
+        let interval: number = DEFAULT_INTERVAL;
 
         if (this.config.interval) {
             interval = this.config.interval;
         } else if (
-            kaserConfig.service.maxSilenceTimeInSeconds &&
+            kaserConfig?.service.maxSilenceTimeInSeconds &&
             typeof kaserConfig.service.maxSilenceTimeInSeconds === 'number'
         ) {
             interval = kaserConfig.service.maxSilenceTimeInSeconds;
-        } else {
-            interval = DEFAULT_INTERVAL;
         }
 
         interval -= this.config.intervalMargin || DEFAULT_INTERVAL_MARGIN;
@@ -66,12 +75,16 @@ export default class KaserSender {
 
     private startSender(serviceName: string, seconds: number, transport: Transport) {
         const interval = seconds * 1000;
-        console.log(`[Kaser Sender] started with ${seconds} seconds interval`);
+        Logger.log(LoggingLevel.Info, `started with ${seconds} seconds interval`);
 
-        transport.send(this.createAliveSignal(serviceName));
+        transport.send(this.createAliveSignal(serviceName)).catch(reason => {
+            Logger.log(LoggingLevel.Error, `could not send alive signal`, reason);
+        });
 
         setInterval(async () => {
-            transport.send(this.createAliveSignal(serviceName));
+            transport.send(this.createAliveSignal(serviceName)).catch(reason => {
+                Logger.log(LoggingLevel.Warning, `could not send alive signal`);
+            });
         }, interval);
     }
 
