@@ -1,3 +1,5 @@
+import { AllowedLevels } from './utils/logger';
+
 export interface KaserConfig {
     rabbitMQ: {
         isActive: boolean;
@@ -32,6 +34,7 @@ export interface KaserSenderConfig {
         routingKey?: string;
         exchangeType?: string;
     };
+    logger?: { allowedLevels?: AllowedLevels; printFullErrors?: boolean };
     interval?: number;
     intervalMargin?: number;
     useHttp?: boolean;
