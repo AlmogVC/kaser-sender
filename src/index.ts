@@ -6,13 +6,10 @@ export type KaserSenderConfig = KaserTypes.KaserSenderConfig;
 
 let kaserSender: KaserSender;
 
-export function init(config: KaserSenderConfig) {
-    Logger.setAllowedLevels(config.logger?.allowedLevels || { ERROR: true });
-    Logger.printFullErrors = config.logger?.printFullErrors || false;
+export function start(userConfig: KaserSenderConfig) {
+    Logger.setAllowedLevels(userConfig.logger?.allowedLevels || { ERROR: true });
+    Logger.printFullErrors = userConfig.logger?.printFullErrors || false;
 
-    kaserSender = new KaserSender(config);
-}
-
-export function start() {
-    if (kaserSender) kaserSender.start();
+    kaserSender = new KaserSender();
+    kaserSender.start(userConfig);
 }

@@ -1,6 +1,6 @@
 import Transport from './transport';
 import { AliveSignal } from '../kaser.types';
-import * as rabbitMQ from '../utils/rabbitmq';
+import RabbitMQ from '../utils/rabbitmq';
 
 export interface RabbitTransportConfig {
     username: string;
@@ -14,17 +14,28 @@ export interface RabbitTransportConfig {
 
 export class RabbitTransport extends Transport {
     config: RabbitTransportConfig;
+    rabbitMQ: RabbitMQ;
 
     constructor(config: RabbitTransportConfig) {
         super();
         this.config = config;
+        this.rabbitMQ = new RabbitMQ(this.config.username, this.config.password, this.config.host, this.config.port);
     }
 
     init() {
-        return rabbitMQ.connect(this.config.username, this.config.password, this.config.host, this.config.port);
+        return this.rabbitMQ.connect();
     }
 
-    send(aliveSignal: AliveSignal): Promise<any> {
-        return rabbitMQ.publish(this.config.exchange, this.config.exchangeType, this.config.routingKey, aliveSignal);
+    async send(aliveSignal: AliveSignal): Promise<any> {
+        if (!this.rabbitMQ.connection) {
+            await this.init();
+        }
+
+        return this.rabbitMQ.publish(
+            this.config.exchange,
+            this.config.exchangeType,
+            this.config.routingKey,
+            aliveSignal,
+        );
     }
 }
