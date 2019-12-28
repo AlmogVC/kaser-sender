@@ -24,7 +24,7 @@ export class RabbitTransport extends Transport {
         return rabbitMQ.connect(this.config.username, this.config.password, this.config.host, this.config.port);
     }
 
-    send(aliveSignal: AliveSignal) {
-        rabbitMQ.publish(this.config.exchange, this.config.exchangeType, this.config.routingKey, aliveSignal);
+    send(aliveSignal: AliveSignal): Promise<any> {
+        return rabbitMQ.publish(this.config.exchange, this.config.exchangeType, this.config.routingKey, aliveSignal);
     }
 }
