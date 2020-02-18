@@ -17,10 +17,14 @@ export default class KaserSender {
             userConfig.kaserService.protocol,
         );
 
-        const kaserConfig: KaserConfig | undefined = await kaserService.getConfig().catch(reason => {
-            Logger.log(LoggingLevel.Error, `could not connect to kaser to get config`, reason);
-            return undefined;
-        });
+        let kaserConfig: KaserConfig | undefined;
+
+        if (userConfig.useKasersConfig) {
+            kaserConfig = await kaserService.getConfig().catch(reason => {
+                Logger.log(LoggingLevel.Error, `could not connect to kaser to get config`, reason);
+                return undefined;
+            });
+        }
 
         const transport: Transport = await this.getTransport(kaserService, userConfig, kaserConfig);
 
@@ -34,11 +38,17 @@ export default class KaserSender {
         userConfig: KaserSenderConfig,
         kaserConfig: KaserConfig | undefined,
     ) {
-        const isRmqActive =
-            userConfig.useHttp !== undefined ? !userConfig.useHttp : kaserConfig?.rabbitMQ.isActive || false;
+        let useRabbitMqTransport: boolean;
+
+        if (kaserConfig) {
+            useRabbitMqTransport = kaserConfig?.rabbitMQ?.isActive;
+        } else {
+            useRabbitMqTransport = !userConfig.useHttpTransport || false;
+        }
+
         let transport: Transport;
 
-        if (isRmqActive) {
+        if (useRabbitMqTransport) {
             transport = new RabbitTransport(this.getRabbitMqConfig(userConfig, kaserConfig));
 
             const rabbitMqConnection = await (transport as RabbitTransport).init().catch(reason => {
@@ -78,13 +88,13 @@ export default class KaserSender {
         kaserConfig: KaserConfig | undefined,
     ): RabbitTransportConfig {
         return {
-            host: userConfig.rabbitMQ?.host || kaserConfig?.rabbitMQ.host || 'localhost',
-            port: userConfig.rabbitMQ?.port || kaserConfig?.rabbitMQ.port || 5672,
+            host: kaserConfig?.rabbitMQ?.host || userConfig.rabbitMQ?.host || 'localhost',
+            port: kaserConfig?.rabbitMQ?.port || userConfig.rabbitMQ?.port || 5672,
             username: userConfig.rabbitMQ?.user || 'guest',
             password: userConfig.rabbitMQ?.password || 'guest',
-            exchange: userConfig.rabbitMQ?.exchange || kaserConfig?.rabbitMQ.exchange || 'kaser-exchange',
+            exchange: kaserConfig?.rabbitMQ?.exchange || userConfig.rabbitMQ?.exchange || 'kaser-exchange',
             routingKey: userConfig.rabbitMQ?.routingKey || `test.aliveSignal`,
-            exchangeType: userConfig.rabbitMQ?.exchangeType || kaserConfig?.rabbitMQ.exchangeType || 'topic',
+            exchangeType: kaserConfig?.rabbitMQ?.exchangeType || userConfig.rabbitMQ?.exchangeType || 'topic',
         };
     }
 

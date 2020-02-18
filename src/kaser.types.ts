@@ -24,7 +24,7 @@ export interface KaserSenderConfig {
     kaserService: {
         hostname: string;
         port: number;
-        protocol: 'http' | 'https';
+        protocol?: 'http' | 'https';
     };
     rabbitMQ?: {
         user: string;
@@ -38,7 +38,7 @@ export interface KaserSenderConfig {
     logger?: { allowedLevels?: AllowedLevels; printFullErrors?: boolean };
     interval?: number;
     intervalMargin?: number;
-    useHttp?: boolean;
+    useHttpTransport?: boolean;
     serviceName: string;
-    useLocalConfig?: boolean;
+    useKasersConfig?: boolean;
 }
