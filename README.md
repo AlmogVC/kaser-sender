@@ -13,14 +13,19 @@ KaserSender.start({
     kaserService: {
         hostname: 'localhost',
         port: 5001,
+        protocol: 'https',
     },
     serviceName: 'test-service',
-    interval: 10,
-    intervalMargin: 2,
+    interval: 60,
+    intervalMargin: 5,
     useHttp: true,
     logger: {
+        printFullErrors: true,
         allowedLevels: {
-            ERROR: true,
+            DEBUG: true;
+            INFO: true;
+            WARNING: true;
+            ERROR: true;
         },
     },
 });
@@ -35,6 +40,7 @@ The config will be provided as a parameter to the init() function.
     kaserService: {
         hostname: String;
         port: Number;
+        protocol: 'http' | 'https';
     };
     rabbitMQ?: {
         user: String;
