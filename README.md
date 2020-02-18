@@ -18,7 +18,8 @@ KaserSender.start({
     serviceName: 'test-service',
     interval: 60,
     intervalMargin: 5,
-    useHttp: true,
+    useHttpTransport: true,
+    useKasersConfig: false,
     logger: {
         printFullErrors: true,
         allowedLevels: {
@@ -62,8 +63,15 @@ The config will be provided as a parameter to the init() function.
     };
     interval?: Number;
     intervalMargin?: Number;
-    useHttp?: Boolean;
+    useHttpTransport?: Boolean;
     serviceName: String;
-    useLocalConfig?: Boolean;
+    useKasersConfig?: Boolean;
 }
 ```
+
+When setting useKasersConfig to `true`, kaser-sender will ask kaser for its config, and use that config (while ignoring the local config)
+If a specific parameter was not present in kaser's config, kaser-sender will use the value provided in the local one, or the default value.
+
+When setting useKasersConfig to `false` (or not setting any value to it), kaser-sender will use the local config.
+
+`useHttpTransport` will tell kaser-sender to use http transport, unless `useKasersConfig` was set to true.
