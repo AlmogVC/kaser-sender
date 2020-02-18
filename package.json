@@ -1,6 +1,6 @@
 {
     "name": "kaser-sender",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "description": "An npm package that sends alive signals to Kaser",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
