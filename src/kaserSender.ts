@@ -14,6 +14,7 @@ export default class KaserSender {
         const kaserService: KaserService = new KaserService(
             userConfig.kaserService.hostname,
             userConfig.kaserService.port,
+            userConfig.kaserService.protocol,
         );
 
         const kaserConfig: KaserConfig | undefined = await kaserService.getConfig().catch(reason => {

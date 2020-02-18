@@ -1,25 +1,33 @@
 import * as http from 'http';
+import * as https from 'https';
 import * as querystring from 'querystring';
 
-export function httpGet(hostname: string, port: number, apiPath: string): Promise<any> {
+export function httpGet(
+    protocol: 'http' | 'https' = 'http',
+    hostname: string,
+    port: number,
+    apiPath: string,
+): Promise<any> {
     return new Promise((resolve, reject) => {
-        http.get(`http://${hostname}:${port}${apiPath}`, res => {
-            let data = '';
+        getSelectedProtocol(protocol)
+            .get(`${protocol}://${hostname}:${port}${apiPath}`, res => {
+                let data = '';
 
-            res.on('data', chunk => {
-                data += chunk;
-            });
+                res.on('data', chunk => {
+                    data += chunk;
+                });
 
-            res.on('end', () => {
-                return resolve(JSON.parse(data));
+                res.on('end', () => {
+                    return resolve(JSON.parse(data));
+                });
+            })
+            .on('error', err => {
+                return reject(err);
             });
-        }).on('error', err => {
-            return reject(err);
-        });
     });
 }
 
-export function httpPost(hostname: string, port: number, path: string, body: any) {
+export function httpPost(protocol: 'http' | 'https' = 'http', hostname: string, port: number, path: string, body: any) {
     const postData = querystring.stringify(body);
     const options = {
         hostname,
@@ -33,7 +41,7 @@ export function httpPost(hostname: string, port: number, path: string, body: any
     };
 
     return new Promise((resolve, reject) => {
-        const req = http
+        const req = getSelectedProtocol(protocol)
             .request(options, res => {
                 let data = '';
 
@@ -52,4 +60,15 @@ export function httpPost(hostname: string, port: number, path: string, body: any
         req.write(postData);
         req.end();
     });
+}
+
+function getSelectedProtocol(protocol: 'http' | 'https') {
+    switch (protocol) {
+        case 'http':
+            return http;
+        case 'https':
+            return https;
+        default:
+            return http;
+    }
 }

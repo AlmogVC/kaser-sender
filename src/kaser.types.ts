@@ -24,6 +24,7 @@ export interface KaserSenderConfig {
     kaserService: {
         hostname: string;
         port: number;
+        protocol: 'http' | 'https';
     };
     rabbitMQ?: {
         user: string;
